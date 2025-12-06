@@ -10,13 +10,13 @@ class Go2StandPolicy(nn.Module):
     Policy class for Unitree Go2 Stand-Still task.
     Implements an Actor-Critic architecture using MLPs.
     """
-    def __init__(self, obs_dim: int, action_dim: int, hidden=(512, 512, 256, 128)):
+    def __init__(self, obs_dim: int, action_dim: int, hidden_dims=(512, 512, 256, 128)):
         super().__init__()
         
         # Actor Network
         actor_layers = []
         last_dim = obs_dim
-        for h in hidden:
+        for h in hidden_dims:
             actor_layers.append(nn.Linear(last_dim, h))
             actor_layers.append(nn.ReLU())
         self.actor = nn.Sequential(*actor_layers, nn.Linear(last_dim, action_dim))

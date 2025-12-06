@@ -82,16 +82,3 @@ class StudentPPOCfg(RslRlPpoAlgorithmCfg):
 class StudentRunnerCfg(BasePPORunnerCfg):
     actor_critic = StudentActorCriticCfg()
     algorithm = StudentPPOCfg()
-
-@configclass
-class StandActorCriticCfg(RslRlPpoActorCriticCfg):
-    class_name = "unitree_rl_lab.tasks.locomotion.policies.go2_stand_policy.Go2StandPolicy"
-    init_args = {
-        "hidden": (512, 512, 256, 128),
-    }
-
-@configclass
-class StandPPORunnerCfg(BasePPORunnerCfg):
-    actor_critic = StandActorCriticCfg()
-    algorithm = RslRlPpoAlgorithmCfg()
-
