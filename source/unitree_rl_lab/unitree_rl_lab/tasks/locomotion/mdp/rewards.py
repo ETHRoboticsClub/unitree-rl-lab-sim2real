@@ -30,7 +30,7 @@ def energy(env: ManagerBasedRLEnv, asset_cfg: SceneEntityCfg = SceneEntityCfg("r
 
 
 def stand_still(
-    env: ManagerBasedRLEnv, command_name: str = "base_velocity", asset_cfg: SceneEntityCfg = SceneEntityCfg("robot")
+        env: ManagerBasedRLEnv, command_name: str = "base_velocity", asset_cfg: SceneEntityCfg = SceneEntityCfg("robot")
 ) -> torch.Tensor:
     asset: Articulation = env.scene[asset_cfg.name]
 
@@ -45,7 +45,7 @@ Robot.
 
 
 def orientation_l2(
-    env: ManagerBasedRLEnv, desired_gravity: list[float], asset_cfg: SceneEntityCfg = SceneEntityCfg("robot")
+        env: ManagerBasedRLEnv, desired_gravity: list[float], asset_cfg: SceneEntityCfg = SceneEntityCfg("robot")
 ) -> torch.Tensor:
     """Reward the agent for aligning its gravity with the desired gravity vector using L2 squared kernel."""
     # extract the used quantities (to enable type-hinting)
@@ -66,7 +66,7 @@ def upward(env: ManagerBasedRLEnv, asset_cfg: SceneEntityCfg = SceneEntityCfg("r
 
 
 def joint_position_penalty(
-    env: ManagerBasedRLEnv, asset_cfg: SceneEntityCfg, stand_still_scale: float, velocity_threshold: float
+        env: ManagerBasedRLEnv, asset_cfg: SceneEntityCfg, stand_still_scale: float, velocity_threshold: float
 ) -> torch.Tensor:
     """Penalize joint position error from default on the articulation."""
     # extract the used quantities (to enable type-hinting)
@@ -93,11 +93,11 @@ def feet_stumble(env: ManagerBasedRLEnv, sensor_cfg: SceneEntityCfg) -> torch.Te
 
 
 def feet_height_body(
-    env: ManagerBasedRLEnv,
-    command_name: str,
-    asset_cfg: SceneEntityCfg,
-    target_height: float,
-    tanh_mult: float,
+        env: ManagerBasedRLEnv,
+        command_name: str,
+        asset_cfg: SceneEntityCfg,
+        target_height: float,
+        tanh_mult: float,
 ) -> torch.Tensor:
     """Reward the swinging feet for clearing a specified height off the ground"""
     asset: RigidObject = env.scene[asset_cfg.name]
@@ -117,6 +117,7 @@ def feet_height_body(
     reward *= torch.clamp(-env.scene["robot"].data.projected_gravity_b[:, 2], 0, 0.7) / 0.7
     return reward
 
+
 def feet_air_time(env, sensor_cfg: SceneEntityCfg, command_name: str, threshold: float):
     """
     Reward airtime: encourages pushing off ground into a jump.
@@ -133,7 +134,7 @@ def feet_air_time(env, sensor_cfg: SceneEntityCfg, command_name: str, threshold:
 
 
 def foot_clearance_reward(
-    env: ManagerBasedRLEnv, asset_cfg: SceneEntityCfg, target_height: float, std: float, tanh_mult: float
+        env: ManagerBasedRLEnv, asset_cfg: SceneEntityCfg, target_height: float, std: float, tanh_mult: float
 ) -> torch.Tensor:
     """Reward the swinging feet for clearing a specified height off the ground"""
     asset: RigidObject = env.scene[asset_cfg.name]
@@ -144,7 +145,7 @@ def foot_clearance_reward(
 
 
 def feet_too_near(
-    env: ManagerBasedRLEnv, threshold: float = 0.2, asset_cfg: SceneEntityCfg = SceneEntityCfg("robot")
+        env: ManagerBasedRLEnv, threshold: float = 0.2, asset_cfg: SceneEntityCfg = SceneEntityCfg("robot")
 ) -> torch.Tensor:
     asset: Articulation = env.scene[asset_cfg.name]
     feet_pos = asset.data.body_pos_w[:, asset_cfg.body_ids, :]
@@ -153,7 +154,7 @@ def feet_too_near(
 
 
 def feet_contact_without_cmd(
-    env: ManagerBasedRLEnv, sensor_cfg: SceneEntityCfg, command_name: str = "base_velocity"
+        env: ManagerBasedRLEnv, sensor_cfg: SceneEntityCfg, command_name: str = "base_velocity"
 ) -> torch.Tensor:
     """
     Reward for feet contact when the command is zero.
@@ -187,12 +188,12 @@ Feet Gait rewards.
 
 
 def feet_gait(
-    env: ManagerBasedRLEnv,
-    period: float,
-    offset: list[float],
-    sensor_cfg: SceneEntityCfg,
-    threshold: float = 0.5,
-    command_name=None,
+        env: ManagerBasedRLEnv,
+        period: float,
+        offset: list[float],
+        sensor_cfg: SceneEntityCfg,
+        threshold: float = 0.5,
+        command_name=None,
 ) -> torch.Tensor:
     contact_sensor: ContactSensor = env.scene.sensors[sensor_cfg.name]
     is_contact = contact_sensor.data.current_contact_time[:, sensor_cfg.body_ids] > 0
@@ -253,6 +254,7 @@ def _axis_angle_from_up(env, axis: str):
 
     return torch.atan2(num, z)
 
+
 def yaw_rate_penalty_air(env, sensor_cfg: SceneEntityCfg,
                          asset_cfg: SceneEntityCfg = SceneEntityCfg("robot")):
     """Penalize |yaw rate| only while airborne."""
@@ -263,6 +265,7 @@ def yaw_rate_penalty_air(env, sensor_cfg: SceneEntityCfg,
     airborne = (foot_f < 1.0).all(dim=1)
     return wz * airborne.float()
 
+
 def non_target_axis_leak_air(env, sensor_cfg: SceneEntityCfg, target_axis: str):
     """Discourage roll if we want pitch (and vice-versa), only in air."""
     other = "roll" if target_axis == "pitch" else "pitch"
@@ -271,6 +274,7 @@ def non_target_axis_leak_air(env, sensor_cfg: SceneEntityCfg, target_axis: str):
     foot_f = contact_sensor.data.net_forces_w[:, sensor_cfg.body_ids, :].norm(dim=-1)
     airborne = (foot_f < 1.0).all(dim=1)
     return leak * airborne.float()
+
 
 def target_axis_rate_air(env, sensor_cfg: SceneEntityCfg, axis: str,
                          asset_cfg: SceneEntityCfg = SceneEntityCfg("robot")):
@@ -281,15 +285,16 @@ def target_axis_rate_air(env, sensor_cfg: SceneEntityCfg, axis: str,
     else:
         ang = -asset.data.root_ang_vel_b[:, 0]
 
-    ang = torch.clamp(ang, min=0.0)     # roll uses x, pitch uses y
+    ang = torch.clamp(ang, min=0.0)  # roll uses x, pitch uses y
     contact_sensor = env.scene.sensors[sensor_cfg.name]
     foot_f = contact_sensor.data.net_forces_w[:, sensor_cfg.body_ids, :].norm(dim=-1)
     airborne = (foot_f < 1.0).all(dim=1)
     return ang * airborne.float()
 
+
 def backflip_progress(env, sensor_cfg: SceneEntityCfg, axis: str,
                       full_rotation_rad: float,
-                    min_airtime_for_progress: float = 0.1,
+                      min_airtime_for_progress: float = 0.1,
                       upright_bonus: float = 0.0,  # disabled
                       air_only: bool = True,
                       landing_window_s: float = 0.6):
@@ -311,6 +316,7 @@ def backflip_progress(env, sensor_cfg: SceneEntityCfg, axis: str,
         progress = progress * airborne.float() * is_real_jump.float()
 
     return progress
+
 
 def successful_backflip(env, sensor_cfg: SceneEntityCfg, upright_tol_rad: float, axis: str,
                         min_airtime_s: float, post_land_stable_s: float, full_rotation_rad: float):
@@ -351,6 +357,7 @@ def successful_backflip(env, sensor_cfg: SceneEntityCfg, upright_tol_rad: float,
     env._flip_state["seen_upside_down"][success] = False  # one-shot
     return success
 
+
 def upward_vel_air_airborne(env, sensor_cfg: SceneEntityCfg = SceneEntityCfg("contact_forces"),
                             asset_cfg: SceneEntityCfg = SceneEntityCfg("robot")):
     """
@@ -363,23 +370,25 @@ def upward_vel_air_airborne(env, sensor_cfg: SceneEntityCfg = SceneEntityCfg("co
     # airborne mask
     contact_sensor = env.scene.sensors[sensor_cfg.name]
     foot_f = contact_sensor.data.net_forces_w[:, sensor_cfg.body_ids, :].norm(dim=-1)
-    airborne = (foot_f < 1.0).all(dim=1)    # [N]
+    airborne = (foot_f < 1.0).all(dim=1)  # [N]
 
     return zvel * airborne.float()
+
 
 def post_flip_land_reward(env: ManagerBasedRLEnv, sensor_cfg: SceneEntityCfg, min_airtime_s: float) -> torch.Tensor:
     """Rewards all feet being in contact AFTER a jump."""
     contact_sensor: ContactSensor = env.scene.sensors[sensor_cfg.name]
-    
+
     # Check for landing on feet (all feet have contact)
-    foot_forces = contact_sensor.data.net_forces_w[:, sensor_cfg.body_ids, 2] # [N, num_feet]
-    on_feet = (foot_forces.abs() > 1.0).all(dim=1) # [N]
+    foot_forces = contact_sensor.data.net_forces_w[:, sensor_cfg.body_ids, 2]  # [N, num_feet]
+    on_feet = (foot_forces.abs() > 1.0).all(dim=1)  # [N]
 
     # Check that a jump just happened (minimum air time was met)
-    last_air = contact_sensor.data.last_air_time[:, sensor_cfg.body_ids]      # [N, 4]
+    last_air = contact_sensor.data.last_air_time[:, sensor_cfg.body_ids]  # [N, 4]
     jumped = (last_air.min(dim=1).values >= min_airtime_s)
 
     return (on_feet & jumped).float()
+
 
 def ang_vel_x_l2(env: ManagerBasedRLEnv, asset_cfg: SceneEntityCfg = SceneEntityCfg("robot")) -> torch.Tensor:
     """Penalize angular velocity in the x-direction (roll)."""
@@ -391,3 +400,124 @@ def ang_vel_z_l2(env: ManagerBasedRLEnv, asset_cfg: SceneEntityCfg = SceneEntity
     """Penalize angular velocity in the z-direction (yaw)."""
     asset: RigidObject = env.scene[asset_cfg.name]
     return torch.square(asset.data.root_ang_vel_b[:, 2])
+
+
+"""
+Bipedal Walk Rewards and Terminations
+"""
+
+
+def bipedal_stance_reward(
+        env: ManagerBasedRLEnv,
+        fore_sensor_cfg: SceneEntityCfg,
+        hind_sensor_cfg: SceneEntityCfg,
+        fore_penalty_scale: float,
+        hind_reward_scale: float,
+) -> torch.Tensor:
+    """
+    Rewards maintaining a bipedal stance (hind legs only).
+    - Large positive reward for hind feet contact (hind_reward_scale).
+    - Large negative penalty (proportional to force) for fore feet contact (fore_penalty_scale).
+    """
+    # Assuming both cfgs point to the same sensor name, but different body_ids
+    contact_sensor: ContactSensor = env.scene.sensors[fore_sensor_cfg.name]
+
+    # Forelegs penalty: Sum of forces
+    fore_forces = contact_sensor.data.net_forces_w[:, fore_sensor_cfg.body_ids, :].norm(dim=-1)
+    fore_penalty = torch.sum(fore_forces, dim=1) * fore_penalty_scale
+
+    # Hindlegs reward: All hind feet in firm contact
+    hind_forces = contact_sensor.data.net_forces_w[:, hind_sensor_cfg.body_ids, :].norm(dim=-1)
+    # Threshold for "contact" can be strict, e.g., > 10.0 N
+    hind_contact = (hind_forces > 10.0).all(dim=1)
+    hind_reward = hind_contact.float() * hind_reward_scale
+
+    return hind_reward - fore_penalty
+
+
+def bipedal_forward_velocity(
+        env: ManagerBasedRLEnv,
+        asset_cfg: SceneEntityCfg,
+        fore_sensor_cfg: SceneEntityCfg,
+        hind_sensor_cfg: SceneEntityCfg,
+) -> torch.Tensor:
+    """
+    Reward forward linear velocity ONLY when bipedal stance is maintained.
+    """
+    # Check stance
+    contact_sensor: ContactSensor = env.scene.sensors[fore_sensor_cfg.name]
+
+    hind_forces = contact_sensor.data.net_forces_w[:, hind_sensor_cfg.body_ids, :].norm(dim=-1)
+    hind_contact = (hind_forces > 10.0).all(dim=1)
+
+    fore_forces = contact_sensor.data.net_forces_w[:, fore_sensor_cfg.body_ids, :].norm(dim=-1)
+    fore_clear = (fore_forces < 5.0).all(dim=1)  # Allow slight touch? No, user said strictly.
+
+    is_bipedal = hind_contact & fore_clear
+
+    # Velocity
+    asset: RigidObject = env.scene[asset_cfg.name]
+    vel_x = asset.data.root_lin_vel_b[:, 0]
+
+    return is_bipedal.float() * vel_x
+
+
+def bipedal_posture_penalty(
+        env: ManagerBasedRLEnv,
+        asset_cfg: SceneEntityCfg,
+        threshold_rad: float
+) -> torch.Tensor:
+    """
+    Penalize deviations in pitch and roll from upright.
+    """
+    asset: RigidObject = env.scene[asset_cfg.name]
+    # Projected gravity [0, 0, -1] is ideal.
+    # We penalize horizontal components of projected gravity.
+    grav_b = asset.data.projected_gravity_b
+    horizontal_grav = torch.norm(grav_b[:, :2], dim=1)
+
+    # Thresholding
+    threshold_val = math.sin(threshold_rad)
+    return (horizontal_grav - threshold_val).clamp(min=0.0)
+
+
+def bipedal_height_reward(
+        env: ManagerBasedRLEnv,
+        asset_cfg: SceneEntityCfg,
+        target_height: float,
+        epsilon: float = 0.05
+) -> torch.Tensor:
+    """
+    Reward for maintaining CoM height near target.
+    """
+    asset: RigidObject = env.scene[asset_cfg.name]
+    root_z = asset.data.root_pos_w[:, 2]
+    # Simple L2 kernel
+    error = torch.square(root_z - target_height)
+    return torch.exp(-error / (epsilon ** 2))
+
+
+def bipedal_foreleg_contact_term(
+        env: ManagerBasedRLEnv,
+        sensor_cfg: SceneEntityCfg,
+        max_duration: float
+) -> torch.Tensor:
+    """Terminate if any foreleg touches ground for longer than max_duration."""
+    contact_sensor: ContactSensor = env.scene.sensors[sensor_cfg.name]
+    # current_contact_time is [N, num_bodies]
+    fore_times = contact_sensor.data.current_contact_time[:, sensor_cfg.body_ids]
+    return (fore_times > max_duration).any(dim=1)
+
+
+def bipedal_excessive_tilt_term(
+        env: ManagerBasedRLEnv,
+        asset_cfg: SceneEntityCfg,
+        limit_rad: float
+) -> torch.Tensor:
+    """Terminate if pitch/roll exceeds limit."""
+    asset: RigidObject = env.scene[asset_cfg.name]
+    grav_b = asset.data.projected_gravity_b
+    # If z-component of gravity is too small, we are tilted.
+    # vertical z=1 => upright. z=cos(30) => 30 deg tilt.
+    # We fail if z < cos(limit)
+    return grav_b[:, 2] < math.cos(limit_rad)
