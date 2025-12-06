@@ -1,4 +1,6 @@
 import math
+import torch
+from isaaclab.envs import ManagerBasedRLEnv
 
 import isaaclab.sim as sim_utils
 import isaaclab.terrains as terrain_gen
@@ -20,6 +22,21 @@ from isaaclab.utils.noise import AdditiveUniformNoiseCfg as Unoise
 
 from unitree_rl_lab.assets.robots.unitree import UNITREE_GO2_CFG as ROBOT_CFG
 from unitree_rl_lab.tasks.locomotion import mdp
+
+def stand_height_reward(
+    env: ManagerBasedRLEnv,
+    asset_cfg: SceneEntityCfg,
+    target_height: float,
+    epsilon: float = 0.05
+) -> torch.Tensor:
+    """
+    Reward for maintaining CoM height near target.
+    """
+    asset = env.scene[asset_cfg.name]
+    root_z = asset.data.root_pos_w[:, 2]
+    # Simple L2 kernel
+    error = torch.square(root_z - target_height)
+    return torch.exp(-error / (epsilon ** 2))
 
 COBBLESTONE_ROAD_CFG = terrain_gen.TerrainGeneratorCfg(
     size=(8.0, 8.0),
@@ -239,7 +256,7 @@ class RewardsCfg:
     # Stand height reward
     # Using bipedal_height_reward but for quadruped standing height (approx 0.28m-0.30m for Go2)
     base_height = RewTerm(
-        func=mdp.bipedal_height_reward,
+        func=stand_height_reward,
         weight=2.0,
         params={"asset_cfg": SceneEntityCfg("robot"), "target_height": 0.28, "epsilon": 0.05}
     )

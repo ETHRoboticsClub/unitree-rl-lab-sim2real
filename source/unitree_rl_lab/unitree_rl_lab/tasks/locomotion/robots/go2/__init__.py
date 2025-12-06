@@ -28,7 +28,7 @@ gym.register(
     disable_env_checker=True,
     kwargs={
         "env_cfg_entry_point": f"{__name__}.stand_env_cfg:RobotEnvCfg",
-        "play_env_cfg_entry_point": f"{__name__}.stand_env_cfg:RobotEnvCfg", # Use same for play as no special play cfg yet
-        "rsl_rl_cfg_entry_point": f"unitree_rl_lab.tasks.locomotion.agents.rsl_rl_ppo_cfg:BasePPORunnerCfg",
+        "play_env_cfg_entry_point": f"{__name__}.stand_env_cfg:RobotEnvCfg",
+        "rsl_rl_cfg_entry_point": f"unitree_rl_lab.tasks.locomotion.agents.rsl_rl_ppo_cfg:StandPPORunnerCfg",
     },
 )
