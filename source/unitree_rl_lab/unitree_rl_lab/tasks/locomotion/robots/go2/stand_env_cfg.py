@@ -239,7 +239,7 @@ class RewardsCfg:
     # Stand height reward
     # Using bipedal_height_reward but for quadruped standing height (approx 0.28m-0.30m for Go2)
     base_height = RewTerm(
-        func=mdp.bipedal_height_reward,
+        func=mdp.rewards.bipedal_height_reward,
         weight=2.0,
         params={"asset_cfg": SceneEntityCfg("robot"), "target_height": 0.28, "epsilon": 0.05}
     )
